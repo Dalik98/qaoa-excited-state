@@ -78,7 +78,7 @@ if(args.method == 'corr'):
     fid.plot_energy_from_file(p_values = p_lst + [0], atoms = atoms)
     fid.get_fidelity(p_lst, create_plots = True)
     fid.get_fidelity_min_value(p_lst, mode = "fidelity")
-    fid.get_fidelity_min_value(p_lst, mode = "eigenenergies")
+    fid.get_fidelity_min_value(p_lst, mode = "energies")
 
 elif(args.method == 'basin'):
 

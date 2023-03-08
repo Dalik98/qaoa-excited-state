@@ -45,28 +45,17 @@ class Fidelity():
 
         diag_final_states_array, x_distances = util.read_eigenstates_data([diag_file_path])
         diag_final_states = diag_final_states_array[0]
-        # array_qaoa_final_states, _ = util.read_eigenstates_data(qaoa_file_paths)
 
         fidelities_array = []
         variance_array = []
 
-        # for p, qaoa_final_states in enumerate(array_qaoa_final_states):
-
-        #     fidelities = []
-
-        #     for i, (qaoa_state, diag_state) in enumerate(zip(qaoa_final_states, diag_final_states)):
-                
-        #         fidelity = np.abs(qaoa_state.overlap(diag_state)) ** 2
-        #         fidelities.append(fidelity)
-
-        #     fidelities_array.append( fidelities )
-
         #The fidelity of the eigenstates are mediated through the number of instances under a value of p
-        for qaoa_file_path in qaoa_file_paths:
+        for qaoa_file_path, p in zip(qaoa_file_paths, p_values):
             with open(qaoa_file_path + "/average/info.txt", "r") as f:
 
                 instances = f.readlines()[0].split(',')[1:]
                 instances = [int(instance) for instance in instances]
+                instances.sort()
 
                 qaoa_instance_folders = [qaoa_file_path + "/{}".format(instance) for instance in instances]
                 array_qaoa_instance_final_states, _ = util.read_eigenstates_data(qaoa_instance_folders)
@@ -95,38 +84,31 @@ class Fidelity():
                 for fidelity in fidelity_fixed_dist:
                     tot.append( (fidelity - fidelity_average_array[i])**2 )
 
-                variance_fixed_p.append( np.sqrt(sum(np.array(tot))/len(fidelity_fixed_dist)) )
+                variance_fixed_p.append( np.sqrt(sum(np.array(tot))/len(fidelity_fixed_dist)) ) 
+
+            #It saves in file the variance and the fidelity for a fixed p
+            data = [x_distances, variance_fixed_p]
+            transposed_data = list(zip(*data))
+
+            file_name = main_folder + '/qaoa_p{}/average'.format(p) + '/{}.csv'.format("variance_fidelity")
+            with open(file_name, 'w', encoding='UTF8', newline='') as f:
+                    writer = csv.writer(f, delimiter=' ')
+                    writer.writerows(transposed_data)
+            print("Data saved: {}".format(file_name))
+
             variance_array.append(variance_fixed_p)
 
         self.fidelity = dict(zip(p_values, fidelities_array))
 
-        #it calculates the fidelity
-        # for qaoa_final_states in array_qaoa_final_states:
-            
-        #     fidelities = []
-
-        #     for i, final_state in enumerate(qaoa_final_states):
-
-        #         fidelity = np.abs(final_state.overlap(diag_final_states[i])) ** 2
-        #         fidelities.append(fidelity)
-            
-        #     fidelities_array.append(fidelities)
-
         if(create_plots):
             for n, (fidelities, variances) in enumerate(zip(fidelities_array, variance_array)):
                 plt.errorbar(x_distances, fidelities, variances, fmt='.', markersize=9., label = "p={}".format(p_values[n]))
-                
-
-            # for n, fidelities in enumerate(fidelities_array):
-            #     # plt.plot(x_distances, fidelities, "o-", linewidth = 0.8, label = "p={}".format(p_values[n]))
-            #     print(fidelities)
-            #     plt.scatter(x_distances, fidelities, s=8)
 
             plt.ylim([0, 1.05])
             plt.gca().xaxis.set_major_locator(MultipleLocator(0.5))
             plt.ylabel("Fidelity")
             plt.xlabel("Inter-nuclear distance (a.u.)")
-            plt.title("Fidelity $|<\psi_{diag}|\psi_{qaoa}>|^{2}$ vs Inter-nuclear distance")
+            #plt.title("Fidelity $|<\psi_{diag}|\psi_{qaoa}>|^{2}$ vs Inter-nuclear distance")
 
             legend = ["p = {}".format(p) for p in p_values] if not custom_legend else custom_legend
             file_to_write = self.upper_folder + '/corr' if not qaoa_folders else "data_extra"
@@ -140,8 +122,8 @@ class Fidelity():
 
     def get_fidelity_min_value(self, p_values = [], mode = "fidelity"):
 
-        fidelities = []
-        norm_eigenenergies = []
+        y_data = []
+        y_variance = []
 
         diag_file_path = self.upper_folder + '/diag'
         qaoa_file_paths = [self.upper_folder + '/qaoa_p{}/average'.format(p) for p in p_values]
@@ -150,33 +132,48 @@ class Fidelity():
         index = list(util.NUCLEAR_DISTS[self.molecule_name]).index(binding_dist)
 
         if(mode == "fidelity"):
+            fidelities = []
+            fidelity_variance = []
 
-            for p in p_values:
+            array_fidelity_variance, _ = util.read_variance_data(qaoa_file_paths, energy = False)
+
+            for p, y_var in zip(p_values, array_fidelity_variance):
                 fidelities.append(self.fidelity[p][index])
+                fidelity_variance.append(y_var[index])
 
             y_data = fidelities
+            
+            y_variance = fidelity_variance
 
-        if(mode == "eigenenergies"):
+        if(mode == "energies"):
+
+            norm_eigenenergies = []
+            norm_variance = []
 
             diag_eigenvalues_array, _ = util.read_eigenvalues_data([diag_file_path])
             diag_eigenvalues = diag_eigenvalues_array[0]
             array_qaoa_eigenvalues, _ = util.read_eigenvalues_data(qaoa_file_paths)
+            array_qaoa_variance, _ = util.read_variance_data(qaoa_file_paths)
 
-            for y_qaoa in array_qaoa_eigenvalues:
-                norm_eigenenergies.append(y_qaoa[index]/diag_eigenvalues[index])
+            for y_qaoa, y_var in zip(array_qaoa_eigenvalues, array_qaoa_variance):
+                norm_eigenenergies.append((y_qaoa[index] - diag_eigenvalues[index])/diag_eigenvalues[index])
+                norm_variance.append(y_var[index]/diag_eigenvalues[index])
 
             y_data = norm_eigenenergies
+            y_variance = norm_variance
 
         fig, ax = plt.subplots(1,1)
 
-        ax.scatter(p_values, y_data)
+        # ax.scatter(p_values, y_data)
+        ax.errorbar(p_values, y_data, yerr=y_variance, fmt='.')
+        
         # plt.plot(x_values, y_fit_values, 'r', label='Fit: a={:.3f}, b={:.3f}, c={:.3f}'.format(*popt))
         ax.set_ylabel("Fidelity" if mode == "fidelity" else "Normalized energy")
         ax.xaxis.set_major_locator(MultipleLocator(1))
         ax.set_xlabel("p")
         pre_title = "Fidelity $|<v_{diag}|v_{qaoa}>|^{2}$" if mode == "fidelity" else "Normalized energy"
-        print(binding_dist*util.ANG_TO_BOHR)
-        ax.set_title(pre_title + " vs P" + " for the bond length ({} a.u.)".format(util.round_num(binding_dist*util.ANG_TO_BOHR), 2))
+        
+        #ax.set_title(pre_title + " vs P" + " for they_variance bond length ({} a.u.)".format(util.round_num(binding_dist*util.ANG_TO_BOHR), 2))
         
         file_to_write = self.upper_folder + "/corr/" + mode + "_vs_p.png"
 
@@ -247,7 +244,7 @@ class Fidelity():
 
         ax.set_xlabel("Inter-nuclear distance (a.u.)")
         ax.set_ylabel("Energy (a.u.)")
-        ax.set_title("Bond energy vs Inter-nuclear distance for {}".format(formatted_name))
+        #ax.set_title("Bond energy vs Inter-nuclear distance for {}".format(formatted_name))
 
         ax.xaxis.set_major_locator(MultipleLocator(0.5))
 

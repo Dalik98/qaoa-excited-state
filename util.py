@@ -35,9 +35,9 @@ def read_eigenvalues_data(file_paths):
 
     return read_float_data(file_paths, "eigenenergies")
 
-def read_variance_data(file_paths, dim = 54):
+def read_variance_data(file_paths, dim = 54, energy = True):
 
-    return read_float_data(file_paths, "variance", dim = dim)
+    return read_float_data(file_paths, "variance" if energy else "variance_fidelity", dim = dim)
 
 def read_float_data(file_paths, file_name, dim = 54):
 

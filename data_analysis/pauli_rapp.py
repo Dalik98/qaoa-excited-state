@@ -53,10 +53,12 @@ def decompose(H):
         for j in range(4):
             # if(i == 1 or j == 1): continue
             label = labels[i] + ' $\otimes$ ' + labels[j]
+
             a_ij = 0.25 * HS(kron(S[i], S[j]), H)
             
             if a_ij != 0.0:
                 print("%s\t*\t( %s )" % (c2s(a_ij), label))
+                print(kron(S[i], S[j]))
                 pass
 
             coeff_array.append(a_ij.real)
@@ -65,12 +67,12 @@ def decompose(H):
     return coeff_array, tensor
 
 def coeff_vs_dist(atom1, atom2):
-    q_chem = qu_chemistry(n_qubits = 4, atom1=atom1, atom2=atom2, temp = True)
+    q_chem = qu_chemistry(n_qubits = 4, atom1=atom1, atom2=atom2, temp = False)
 
     energies = []
     coeff_list = []
     tensor_list = []
-    for distance in [4]:
+    for distance in [1.8]:
 
         mat = q_chem.calc_reduced_ham(distance)
         print("Creation of the pauli rappresentation for the hamiltonian at distance:{:0.2f}".format(distance))
@@ -88,22 +90,22 @@ def coeff_vs_dist(atom1, atom2):
     # print(coeff_list, "\n\n\n")
     coeff_list = [list(i) for i in zip(*coeff_list)]
 
-    tensor_temp = []
-    fig, ax = plt.subplots(1,1)
+    # tensor_temp = []
+    # fig, ax = plt.subplots(1,1)
     
-    for i, (coeff, tensor) in enumerate(zip(coeff_list, tensor_list)):
+    # for i, (coeff, tensor) in enumerate(zip(coeff_list, tensor_list)):
 
-        if(np.all((np.array(coeff).round(5)) == 0)): continue
-        plt.plot(q_chem.distances, coeff, '.', label=tensor[i])
-        tensor_temp.append(tensor[i])
+    #     if(np.all((np.array(coeff).round(5)) == 0)): continue
+    #     plt.plot(q_chem.distances, coeff, '.', label=tensor[i])
+    #     tensor_temp.append(tensor[i])
 
-    ax.set_xlabel("Internuclear distance (Ang)")
-    ax.set_ylabel("Coefficents")
-    ax.set_title("Coefficients of pauli representation vs internuclear distance")
+    # ax.set_xlabel("Internuclear distance (Ang)")
+    # ax.set_ylabel("Coefficents")
+    # ax.set_title("Coefficients of pauli representation vs internuclear distance")
 
-    ax.xaxis.set_major_locator(MultipleLocator(0.5))
-    ax.set_ylim([-1.5, 3])
+    # ax.xaxis.set_major_locator(MultipleLocator(0.5))
+    # ax.set_ylim([-1.5, 3])
 
-    plt.legend()
-    plt.savefig(util.getFolderName(atom1 = atom1, atom2 = atom2) + '/extra/coeff_vs_dist.png')
-    print("File created: {}".format(util.getFolderName(atom1 = atom1, atom2 = atom2) + '/extra/coeff_vs_dist.png'))
+    # plt.legend()
+    # plt.savefig(util.getFolderName(atom1 = atom1, atom2 = atom2) + '/extra/coeff_vs_dist.png')
+    # print("File created: {}".format(util.getFolderName(atom1 = atom1, atom2 = atom2) + '/extra/coeff_vs_dist.png'))
