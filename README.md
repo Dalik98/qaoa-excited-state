@@ -26,6 +26,7 @@ The program is written in `Python 3.11`, using the following libraries:
 * [OpenFermion](https://quantumai.google/openfermion)  This library is used for the creation of the Lithium Hydride and Hydrogen molecule Hamiltonian.
 * [Psi4](https://psicode.org/)  OpenFermion relies on this library for the calculation of the one-body, two-body and nuclear repulsion coefficients in the second quantized diatomic Hamiltonian.
 * [SciPy](https://scipy.org/)  It is used for the implementation of the basin-hopping and BFGS optimization methods.
+* [MatPlotLib](https://matplotlib.org/) It is used to generate plots.
 
 ## Usage
 
@@ -41,3 +42,16 @@ Where:
 * `-s` specifies the state to calculate, `-s 0` means the ground state is calculated.
 * `-a1 -a2` these options specify the atoms of the molecule to be considered.
 * `method` specifies what operation perform, `method basin` executes the basin-hopping algorithms, `method diag` perform the calculation of the specified state using the diagonalization method instead of QAOA, `method average` performs the calculation of the average and dev. std. between all the independent calculation for a specific p value performed previously, `method corr` creates the plots that compare the calculation performed with different values of p.
+
+## Results
+The procedure we propose succeed to calculate the excited states, only when the states are not degenerate. The accuracy increases with p.
+
+The following plot shows the ground state energy in function of the internuclear distance for the LiH molecule Hamiltonian. With $p=3$ we have already a good approximation.
+
+![ground state calculation](https://github.com/danieletrisciani/qaoa-excited-states-calculation/assets/20107065/67452abd-1c33-47ef-86f5-3a2a7f5d5ea8)
+
+To calculate the first excited state, we apply the trasformation previously introduced, to obtain the Hamiltonian $H_{\text {1° e.s.}}$. It will be the new cost Hamiltonian. 
+The following plot shows the excited state energy in function of the internuclear distance for the LiH molecule Hamiltonian.
+
+![excited state calculation](https://github.com/danieletrisciani/qaoa-excited-states-calculation/assets/20107065/2ca59971-e431-4a6c-962d-4712d57da5b7)
+
