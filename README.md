@@ -48,10 +48,12 @@ The procedure we propose succeed to calculate the excited states, only when the 
 
 The following plot shows the ground state energy in function of the internuclear distance for the LiH molecule Hamiltonian. With $p=3$ we have already a good approximation.
 
-![ground state calculation](https://github.com/danieletrisciani/qaoa-excited-states-calculation/assets/20107065/67452abd-1c33-47ef-86f5-3a2a7f5d5ea8)
+![excited state calculation](https://github.com/danieletrisciani/qaoa-excited-states-calculation/assets/20107065/2ca59971-e431-4a6c-962d-4712d57da5b7)
 
 To calculate the first excited state, we apply the trasformation previously introduced, to obtain the Hamiltonian $H_{\text {1° e.s.}}$. It will be the new cost Hamiltonian. 
 The following plot shows the excited state energy in function of the internuclear distance for the LiH molecule Hamiltonian.
 
-![excited state calculation](https://github.com/danieletrisciani/qaoa-excited-states-calculation/assets/20107065/2ca59971-e431-4a6c-962d-4712d57da5b7)
+
+![ground state calculation](https://github.com/danieletrisciani/qaoa-excited-states-calculation/assets/20107065/aa173a89-717d-4bd2-abed-f29b88e41cfd)
+
 
