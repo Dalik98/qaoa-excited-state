@@ -32,7 +32,7 @@ The program is written in `Python 3.11`, using the following libraries:
 
 The program works with command line options, for example:
 ```
-$ python main.py method basin -p 1to5 -t 10 -s 1 -a1 Li -a2 H
+$ python main.py basin -p 1to5 -t 10 -s 1 -a1 Li -a2 H
 ```
 The command executes the qaoa classical simulation considering p values from 1 to 5, with 10 independent calculations, applied on the Lithium Hydride Hamiltonian. The basin-hopping optimization method is used for the optimization.
 
@@ -41,12 +41,12 @@ Where:
 * `-t` specifies how many indipendent runs for each value of p the qaoa simulation must be performed.
 * `-s` specifies the state to calculate, `-s 0` means the ground state is calculated.
 * `-a1 -a2` these options specify the atoms of the molecule to be considered.
-* `method` specifies what operation perform, `method basin` executes the basin-hopping algorithms, `method diag` perform the calculation of the specified state using the diagonalization method instead of QAOA, `method average` performs the calculation of the average and dev. std. between all the independent calculation for a specific p value performed previously, `method corr` creates the plots that compare the calculation performed with different values of p.
+* `method` specifies what operation perform, `basin` executes the basin-hopping algorithms, `diag` perform the calculation of the specified state using the diagonalization method instead of QAOA, `average` performs the calculation of the average and dev. std. between all the independent calculation for a specific p value performed previously, `corr` creates the plots that compare the calculation performed with different values of p.
 
 ## Results
 The procedure we propose succeed to calculate the excited states, only when the states are not degenerate. The accuracy increases with p.
 
-The following plot shows the ground state energy in function of the internuclear distance for the LiH molecule Hamiltonian. With $p=3$ we have already a good approximation.
+The following plot shows the ground state energy in function of the internuclear distance for the LiH molecule Hamiltonian. With $p=3$ we have already a good approximation. The average and dev. std. are on 10 independent calculation.
 
 ![excited state calculation](https://github.com/danieletrisciani/qaoa-excited-states-calculation/assets/20107065/2ca59971-e431-4a6c-962d-4712d57da5b7)
 
