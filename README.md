@@ -53,7 +53,10 @@ The following plot shows the ground state energy in function of the internuclear
 To calculate the first excited state, we apply the trasformation previously introduced, to obtain the Hamiltonian $H_{\text {1° e.s.}}$. It will be the new cost Hamiltonian. 
 The following plot shows the excited state energy in function of the internuclear distance for the LiH molecule Hamiltonian.
 
-
 ![ground state calculation](https://github.com/danieletrisciani/qaoa-excited-states-calculation/assets/20107065/aa173a89-717d-4bd2-abed-f29b88e41cfd)
+
+The following plot shows all the states calculated using the qaoa algoritghm for p=5
+
+![all_states_p5](https://github.com/danieletrisciani/qaoa-excited-states-calculation/assets/20107065/0cde6d9e-5fd1-463e-ac16-3cb47eb149c1)
 
 
