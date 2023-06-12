@@ -107,7 +107,7 @@ class Fidelity():
             plt.ylim([0, 1.05])
             plt.gca().xaxis.set_major_locator(MultipleLocator(0.5))
             plt.ylabel("Fidelity")
-            plt.xlabel("Inter-nuclear distance (a.u.)")
+            plt.xlabel("Inter-nuclear distance R (a.u.)")
             #plt.title("Fidelity $|<\psi_{diag}|\psi_{qaoa}>|^{2}$ vs Inter-nuclear distance")
 
             legend = ["p = {}".format(p) for p in p_values] if not custom_legend else custom_legend
@@ -172,6 +172,7 @@ class Fidelity():
         ax.xaxis.set_major_locator(MultipleLocator(1))
         ax.set_xlabel("p")
         pre_title = "Fidelity $|<v_{diag}|v_{qaoa}>|^{2}$" if mode == "fidelity" else "Normalized energy"
+        fig.tight_layout()
         
         #ax.set_title(pre_title + " vs P" + " for they_variance bond length ({} a.u.)".format(util.round_num(binding_dist*util.ANG_TO_BOHR), 2))
         
@@ -242,7 +243,7 @@ class Fidelity():
         if(self.molecule_name == "H2"):
             formatted_name = "$H_{2}$"
 
-        ax.set_xlabel("Inter-nuclear distance (a.u.)")
+        ax.set_xlabel("Inter-nuclear distance R (a.u.)")
         ax.set_ylabel("Energy (a.u.)")
         #ax.set_title("Bond energy vs Inter-nuclear distance for {}".format(formatted_name))
 

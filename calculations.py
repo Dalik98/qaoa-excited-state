@@ -24,7 +24,7 @@ class CalcHandler():
         self.state = state #the number of the state to find, e.g. state = 0 is the ground state
         self.atom1 = atom1
         self.atom2 = atom2
-        self.qaoa_final_states = []
+        self.qaoa_prev_energies = []
 
         self.mix_matrix = mix_matrix
         self.mix_matrix_name = util.getMixMatName(self.mix_matrix)
@@ -34,22 +34,23 @@ class CalcHandler():
         self.q_chem = qu_chemistry(n_qubits = 4, atom1 = self.atom1, atom2 = self.atom2, temp = False)
 
     # this function uses the QAOA algorithm to calculate eigenenergies and eigenvectors of the hamiltonians
-    def find_optimal_distance_qaoa(self, p, qaoa_gs, sgd_method, grad_desc_opts):
+    def find_optimal_distance_qaoa(self, p, qaoa_st, sgd_method, grad_desc_opts):
 
         folder = self.general_main_folder + "_" + self.mix_matrix_name + "/qaoa_p{}".format(p)
         inst = self.getNewInstances(folder)
         folder += "/" + str(inst)
 
         #In case we want to find the excited states
-        if(self.state > 0):
-            file_path = util.getFolderName(0, self.atom1, self.atom2) + '_' + self.mix_matrix_name + '/qaoa_p5/average'
+        for prev_energy in range(0, self.state):
+            file_path = util.getFolderName(prev_energy, self.atom1, self.atom2) + '_' + self.mix_matrix_name + '/qaoa_p5/average'
 
-            self.qaoa_final_states, _ = util.read_eigenstates_data([file_path])
-            self.qaoa_final_states = self.qaoa_final_states[0]
+            temp, _ = util.read_eigenstates_data([file_path])
+            self.qaoa_prev_energies.append(temp[0])
         
         start_calc_string = "Starting the calculation for the state {} of the molecule {} with QAOA: p = {}, mixing: {}"\
             .format(self.state, util.getMoleculeName(self.atom1, self.atom2), p, "X Pauli" if self.mix_matrix == qt.sigmax() else "Y Pauli")
-        if(self.state > 0): start_calc_string += ", use QAOA g.s.: {}".format(qaoa_gs)
+        
+        if(self.state > 0): start_calc_string += ", use QAOA states: {}".format(qaoa_st)
         sgd_param_string = "Using the {} algorithm with n. iterations: {} ".format(sgd_method, grad_desc_opts[0])
         print(start_calc_string)
         print(sgd_param_string)
@@ -69,16 +70,19 @@ class CalcHandler():
             ham = self.q_chem.calc_reduced_ham(distance)
             diag_ground_state = np.round(ham.eigenenergies()[self.state], 5)
 
-            first_state = None
+            extra_energy_states = None
             #Only if we are calculating the excited state
             if(self.state > 0):
 
-                if(qaoa_gs):
-                    first_state = self.qaoa_final_states[n]
-                else:
-                    first_state = ham.eigenstates()[1][0]
+                if(qaoa_st):
+                    extra_energy_states = []
+                    for i in range(0, self.state):
+                        extra_energy_states.append(self.qaoa_prev_energies[i][n])
 
-            qa.set_ham(ham, eigenstate = first_state, lambda_ = util.LAMBDA)
+                else:
+                    extra_energy_states = ham.eigenstates()[1][0]
+
+            qa.set_ham(ham, extra_energy_states = extra_energy_states, lambda_ = util.LAMBDA)
 
             if(sgd_method == 'basin'):
                 qa.optimizeBasinHopper(p, grad_desc_opts[0])
@@ -111,7 +115,7 @@ class CalcHandler():
 
             info_text = "Qaoa parameters: method: {}, n_steps: {}, p_levels: {}, mixing matrix: {}".\
                 format(sgd_method, grad_desc_opts[0], p, "X Pauli" if self.mix_matrix == qt.sigmax() else "Y Pauli")
-            if(self.state > 0): info_text += ", Use QAOA gs: {}".format(qaoa_gs)
+            if(self.state > 0): info_text += ", Use QAOA states: {}".format(qaoa_st)
             info_text += "\n"
 
             f.write(info_text)

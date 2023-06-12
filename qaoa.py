@@ -54,11 +54,15 @@ class Qaoa:
 
         return sum(list_n_sigmax)
 
-    def set_ham(self, ham, eigenstate = None, lambda_ = 0):
+    def set_ham(self, ham, extra_energy_states = None, lambda_ = 0):
 
-        if(eigenstate != None):
-            proj_gs = qt.Qobj(eigenstate.proj(), dims = ham.dims)
-            self.prob_ham = ham + lambda_ * proj_gs
+        if(extra_energy_states != None):
+            
+            self.prob_ham = ham
+            for extra_energy_state in extra_energy_states:
+                
+                proj_gs = qt.Qobj(qt.Qobj(extra_energy_state[0]).proj(), dims = ham.dims)
+                self.prob_ham = self.prob_ham + lambda_ * proj_gs
         else:
             self.prob_ham = ham
 
